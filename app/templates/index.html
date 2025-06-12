@@ -1,0 +1,25 @@
+{% extends "base.html" %} {% block title %}DODON | Home{% endblock %} {% block
+content %}
+<section class="hero">
+  <h1>DODON</h1>
+  <a href="{{ url_for('products.index') }}" class="btn">상품 보러가기</a>
+</section>
+
+<section class="featured">
+  <h2>인기 상품</h2>
+  <div class="product-grid">
+    {% for product in featured_products %}
+    <div class="product-card">
+      <a href="{{ url_for('products.detail', product_id=product.id) }}">
+        <img
+          src="{{ url_for('static', filename='uploads/' ~ product.image) }}"
+          alt="{{ product.name }}"
+        />
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.price }}원</p>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}DODON | 행운을 가져다주는 옷{% endblock %}</title>
+
+    <!-- SEO -->
+    <meta
+      name="description"
+      content="DODON은 20~35세 여성을 위한 유니크한 감성의 브랜드입니다. 롱스커트, 미니원피스, 오버핏 상의 등, 나만의 행운을 이끄는 개성 있는 옷들을 만나보세요."
+    />
+    <meta
+      name="keywords"
+      content="DODON, 도돈, 여성의류, 유니크 옷, 개성 있는 패션, 행운을 부르는 옷, 미니 원피스, 롱스커트, 오버핏 셔츠, 니트, 레싱스, Korean fashion, lucky clothes for women, 20s style, 30s fashion, minimalist clothing, casual wear, trendy outfits, knitwear"
+    />
+    <meta name="author" content="DODON" />
+    <link rel="canonical" href="https://www.dodon.kr/" />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='images/DODON logo.png') }}"
+      type="image/png"
+    />
+
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DODON | 행운을 가져다주는 옷" />
+    <meta
+      property="og:description"
+      content="20~35세 여성을 위한 도돈만의 감성 의류. 행운을 끌어당기는 유니크한 스타일을 지금 만나보세요."
+    />
+    <meta
+      property="og:image"
+      content="{{ url_for('static', filename='images/og-image.jpg') }}"
+    />
+    <meta property="og:url" content="https://www.dodon.kr/" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DODON | Clothes That Bring You Luck" />
+    <meta
+      name="twitter:description"
+      content="Unique fashion for bold women. DODON offers lucky pieces like long skirts and oversized tops for 20s–30s women."
+    />
+    <meta
+      name="twitter:image"
+      content="{{ url_for('static', filename='images/og-image.jpg') }}"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+          <a href="{{ url_for('main.index') }}">
+            <img
+              src="static/images/DODON logo.png"
+              alt="DODON Logo"
+              style="width: 235px; height: auto"
+            />
+          </a>
+        </div>
+        <!-- Navigation Links -->
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('main.index') }}">홈</a></li>
+          <li><a href="{{ url_for('products.index') }}">제품</a></li>
+          <li><a href="{{ url_for('main.index') }}#about">브랜드 소개</a></li>
+          <li><a href="{{ url_for('main.index') }}#contact">문의하기</a></li>
+          <li><a href="{{ url_for('auth_bp.login') }}">로그인</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Main Page Content -->
+    <main>{% block content %} {% endblock %}</main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-links">
+        <a href="#">Contact</a>
+        <a href="#">Instagram</a>
+        <a href="#">Terms</a>
+      </div>
+      <p>&copy; {{ current_year }} DODON. All rights reserved.</p>
+    </footer>
+
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
