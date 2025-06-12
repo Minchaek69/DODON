@@ -20,12 +20,12 @@ ul {
 header {
   border-bottom: 1px solid #eee;
   background: #fff;
-  padding: 12px 32px;
+  padding: 12px auto;
 }
 .header-bar {
   border-bottom: 1px solid #eee;
   background: #fff;
-  padding: 14px 32px;
+  padding: 14px auto;
 }
 
 .header-container {
