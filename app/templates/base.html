@@ -47,9 +47,60 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
+    <style>
+      .flash-messages {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: auto;
+        max-width: 90%;
+      }
+
+      .alert {
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 10px;
+        text-align: center;
+        animation: fadeOut 5s forwards;
+      }
+
+      .alert-success {
+        background-color: #28a745;
+      }
+
+      .alert-error {
+        background-color: #dc3545;
+      }
+
+      .alert-info {
+        background-color: #17a2b8;
+      }
+
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          display: none;
+        }
+      }
+    </style>
   </head>
 
   <body>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %} {% endif %} {% endwith %}
+
     <header class="header-bar">
       <div class="header-container">
         <!-- Left: Logo -->
@@ -78,12 +129,23 @@
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" name="q" placeholder="검색" class="search-box" />
           </form>
-          <a id="login-trigger" title="로그인"
-            ><i class="fa-solid fa-user"></i
-          ></a>
           <a href="/cart" title="장바구니"
             ><i class="fa-solid fa-bag-shopping"></i
           ></a>
+          {% if session.get('email') %}
+          <!-- 로그인 상태: 사용자 정보로 이동 -->
+          <a href="{{ url_for('main.profile') }}" title="마이페이지">
+            <i class="fa-solid fa-user"></i>
+          </a>
+          <a href="{{ url_for('auth_bp.logout') }}" title="로그아웃">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </a>
+          {% else %}
+          <!-- 비로그인 상태: 로그인 모달 열기 -->
+          <a id="login-trigger" title="로그인">
+            <i class="fa-solid fa-user"></i>
+          </a>
+          {% endif %}
         </div>
       </div>
     </header>
@@ -139,6 +201,17 @@
             signupModal.classList.add("hidden")
           );
         }
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        {% if session.get('email') %}
+          // 로그인 후 모달 닫기
+          const loginModal = document.getElementById("login-modal");
+          const signupModal = document.getElementById("signup-modal");
+          if (loginModal) loginModal.classList.add("hidden");
+          if (signupModal) signupModal.classList.add("hidden");
+        {% endif %}
       });
     </script>
     {% block scripts %}{% endblock %}

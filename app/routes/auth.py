@@ -1,37 +1,60 @@
-from flask import Blueprint, request, redirect, url_for
+from flask import Blueprint, request, redirect, url_for, session, flash, render_template
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, User
 
 auth_bp = Blueprint('auth_bp', __name__)
 
-@auth_bp.route('/login', methods=['POST'])
-def login():
-    # Get login form data
-    email_or_username = request.form.get('email')
-    password = request.form.get('password')
-    remember = request.form.get('remember')
-
-    # TODO: Add authentication logic (e.g., check database for user)
-
-    # Redirect to next page after successful login
-    next_page = request.form.get('next') or url_for('main.index')
-    return redirect(next_page)
-
-
-@auth_bp.route('/signup', methods=['POST'])
+@auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
-    # Get signup form data
-    username = request.form.get('username')
-    email = request.form.get('email')
-    phone = request.form.get('phone')
-    password = request.form.get('password')
-    confirm = request.form.get('confirm')
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm = request.form.get('confirm')
+        next_page = request.form.get('next') or url_for('main.index')  
 
-    # TODO: Add logic to create a new user (e.g., insert into database)
+        if not email or not password or password != confirm:
+            flash('Please fill all fields correctly.', 'error')
+            return redirect(url_for('auth_bp.signup'))
 
-    # Redirect to homepage after successful signup
-    return redirect(url_for('main.index'))
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash('Email already registered.', 'error')
+            return redirect(url_for('auth_bp.signup'))
+
+        hashed_password = generate_password_hash(password)
+        new_user = User(email=email, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        session['email'] = email
+        flash('Signup successful! Logged in.', 'success')
+        return redirect(next_page)
+
+    return render_template('signup.html')
+
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        next_page = request.form.get('next') or url_for('main.index')  
+
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            session['email'] = user.email
+            flash('Login successful!', 'success')
+            return redirect(next_page)
+        else:
+            flash('Invalid email or password.', 'error')
+            return redirect(url_for('auth_bp.login'))
+
+    return render_template('login.html')
 
 
 @auth_bp.route('/logout')
 def logout():
-    # TODO: Add logout logic (e.g., clear session)
-    return redirect(url_for('main.index'))
+    session.pop('email', None)
+    flash('You have been logged out.', 'info')
+    next_page = request.args.get('next') or url_for('main.index')  
+    return redirect(next_page)
