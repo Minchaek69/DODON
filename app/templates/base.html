@@ -58,35 +58,27 @@
 
   <body>
     <header>
-      <div class="header-flex">
-        <!-- 1. Logo -->
-        <div class="header-left">
+      <div class="container">
+        <!-- Logo -->
+        <div class="logo">
           <a href="{{ url_for('main.index') }}">
             <img
-              src="{{ url_for('static', filename='images/dodon_logo_wide.png') }}"
+              src="static/images/DODON logo.png"
               alt="DODON Logo"
+              style="width: 235px; height: auto"
             />
           </a>
         </div>
-
-        <!-- 2. Main meun -->
-        <nav class="header-center">
-          <ul>
-            <li><a href="{{ url_for('main.index') }}">홈</a></li>
-            <li><a href="{{ url_for('products.index') }}">제품</a></li>
-            <li><a href="{{ url_for('main.index') }}#about">브랜드 소개</a></li>
-            <li><a href="{{ url_for('main.index') }}#contact">문의하기</a></li>
-          </ul>
-        </nav>
-
-        <!-- 3. Search, Login, Help, Bag -->
-        <div class="header-right">
-          <a href="#">SEARCH</a>
-          <a href="{{ url_for('auth_bp.login') }}">LOG IN</a>
-          <a href="#">HELP</a>
-          <a href="#">BAG [0]</a>
-        </div>
-      </div>
+        <!-- Navigation Links -->
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('main.index') }}">홈</a></li>
+          <li><a href="{{ url_for('products.index') }}">제품</a></li>
+          <li><a href="{{ url_for('main.index') }}#about">브랜드 소개</a></li>
+          <li><a href="{{ url_for('main.index') }}#contact">문의하기</a></li>
+          <li><a href="{{ url_for('auth_bp.login') }}">로그인</a></li>
+        </ul>
+      </nav>
     </header>
 
     <!-- Main Page Content -->
@@ -97,7 +89,6 @@
       <div class="footer-links">
         <a href="#">Contact</a>
         <a href="#">Instagram</a>
-        <a href="#">Pinterest</a>
         <a href="#">Terms</a>
       </div>
       <p>&copy; {{ current_year }} DODON. All rights reserved.</p>
