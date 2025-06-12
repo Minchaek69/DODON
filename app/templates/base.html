@@ -54,41 +54,50 @@
       name="twitter:image"
       content="{{ url_for('static', filename='images/og-image.jpg') }}"
     />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
   </head>
 
   <body>
-    <header>
-      <div class="header-flex">
-        <!-- 1. Logo -->
+    <header class="header-bar">
+      <div class="header-container">
+        <!-- Left: Logo -->
         <div class="header-left">
-          <a href="{{ url_for('main.index') }}">
-            <img
-              src="{{ url_for('static', filename='images/dodon_logo_wide.png') }}"
-              alt="DODON Logo"
-            />
+          <a href="/">
+            <img src="/static/images/dodon_logo_wide.png" alt="DODON Logo" />
           </a>
         </div>
 
-        <!-- 2. Main meun -->
+        <!-- Center: Navigation Menu -->
         <nav class="header-center">
           <ul>
-            <li><a href="{{ url_for('main.index') }}">홈</a></li>
-            <li><a href="{{ url_for('products.index') }}">제품</a></li>
-            <li><a href="{{ url_for('main.index') }}#about">브랜드 소개</a></li>
-            <li><a href="{{ url_for('main.index') }}#contact">문의하기</a></li>
+            <li><a href="#">홈</a></li>
+            <li><a href="#">전체 상품</a></li>
+            <li><a href="#">상의</a></li>
+            <li><a href="#">하의</a></li>
+            <li><a href="#">원피스</a></li>
+            <li><a href="#">니트웨어</a></li>
+            <li><a href="#">브랜드 소개</a></li>
+            <li><a href="#">문의하기</a></li>
           </ul>
         </nav>
 
-        <!-- 3. Search, Login, Help, Bag -->
+        <!-- Right: Icons -->
         <div class="header-right">
-          <a href="#">SEARCH</a>
-          <a href="{{ url_for('auth_bp.login') }}">LOG IN</a>
-          <a href="#">HELP</a>
-          <a href="#">BAG [0]</a>
+          <form action="/search" method="GET" class="search-inline">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q" placeholder="검색" class="search-box" />
+          </form>
+          <a href="/login" title="로그인"><i class="fa-solid fa-user"></i></a>
+          <a href="/cart" title="장바구니"
+            ><i class="fa-solid fa-bag-shopping"></i
+          ></a>
         </div>
       </div>
     </header>
-
     <!-- Main Page Content -->
     <main>{% block content %} {% endblock %}</main>
 
