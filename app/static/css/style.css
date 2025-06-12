@@ -19,30 +19,49 @@ ul {
 
 /* Header */
 header {
-  width: 100%;
-  padding: 20px 40px;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+  padding: 24px auto;
+}
+.header-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  background-color: #fff;
-  z-index: 1000;
-  border-bottom: 1px solid #eee;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 48px;
 }
-.logo img {
-  height: 40px;
+
+.header-left img {
+  height: 100px;
 }
-nav ul {
+
+.header-center ul {
   display: flex;
-  gap: 20px;
+  gap: 48px;
 }
-nav li a {
+.header-center li a {
+  font-size: 15px;
   font-weight: 500;
-  transition: color 0.3s ease;
+  color: #111;
+  transition: 0.2s;
 }
-nav li a:hover {
-  color: #c40030; /* 브랜드 포인트 색 */
+.header-center li a:hover {
+  color: #c40030;
+}
+
+.header-right {
+  display: flex;
+  gap: 32px;
+}
+.header-right a {
+  font-size: 14px;
+  color: #111;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+.header-right a:hover {
+  text-decoration: underline;
 }
 
 /* Main */
