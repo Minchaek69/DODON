@@ -1,0 +1,77 @@
+<!-- Styles -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/login_modal.css') }}"
+/>
+
+<!-- Login Modal -->
+<div id="login-modal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-btn login-close">&times;</span>
+    <h2>로그인</h2>
+    <form method="POST" action="{{ url_for('auth_bp.login') }}">
+      <input type="hidden" name="next" value="{{ request.path }}" />
+
+      <input
+        type="text"
+        name="email"
+        placeholder="이메일 또는 사용자 이름"
+        required
+      />
+      <input type="password" name="password" placeholder="비밀번호" required />
+
+      <div class="login-extra">
+        <label
+          ><input type="checkbox" name="remember" /> 로그인 상태 유지</label
+        >
+        <a href="#" class="open-signup">회원가입</a>
+      </div>
+
+      <button type="submit">로그인</button>
+    </form>
+  </div>
+</div>
+
+<!-- Include Signup Modal -->
+{% include 'signup_modal.html' %}
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='js/login_modal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/signup_modal.js') }}"></script>
+
+<!-- Modal Trigger Script -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const loginModal = document.getElementById("login-modal");
+    const loginTrigger = document.getElementById("login-trigger");
+    const loginClose = document.querySelector(".login-close");
+
+    const signupModal = document.getElementById("signup-modal");
+    const signupClose = document.querySelector(".signup-close");
+    const signupTrigger = document.querySelector(".open-signup");
+
+    if (loginTrigger && loginModal) {
+      loginTrigger.addEventListener("click", () =>
+        loginModal.classList.remove("hidden")
+      );
+    }
+    if (loginClose) {
+      loginClose.addEventListener("click", () =>
+        loginModal.classList.add("hidden")
+      );
+    }
+
+    if (signupTrigger && signupModal) {
+      signupTrigger.addEventListener("click", () => {
+        loginModal.classList.add("hidden");
+        signupModal.classList.remove("hidden");
+      });
+    }
+
+    if (signupClose) {
+      signupClose.addEventListener("click", () =>
+        signupModal.classList.add("hidden")
+      );
+    }
+  });
+</script>

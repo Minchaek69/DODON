@@ -43,18 +43,6 @@
     />
     <meta property="og:url" content="https://www.dodon.kr/" />
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="DODON | Clothes That Bring You Luck" />
-    <meta
-      name="twitter:description"
-      content="Unique fashion for bold women. DODON offers lucky pieces like long skirts and oversized tops for 20s–30s women."
-    />
-    <meta
-      name="twitter:image"
-      content="{{ url_for('static', filename='images/og-image.jpg') }}"
-    />
-
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -90,7 +78,9 @@
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" name="q" placeholder="검색" class="search-box" />
           </form>
-          <a href="/login" title="로그인"><i class="fa-solid fa-user"></i></a>
+          <a id="login-trigger" title="로그인"
+            ><i class="fa-solid fa-user"></i
+          ></a>
           <a href="/cart" title="장바구니"
             ><i class="fa-solid fa-bag-shopping"></i
           ></a>
@@ -111,8 +101,46 @@
       <p>&copy; {{ current_year }} DODON. All rights reserved.</p>
     </footer>
 
+    {% include 'login_modal.html' %} {% include 'signup_modal.html' %}
     <!-- JS -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/login_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/signup_modal.js') }}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginModal = document.getElementById("login-modal");
+        const loginTrigger = document.getElementById("login-trigger");
+        const loginClose = document.querySelector(".login-close");
+
+        const signupModal = document.getElementById("signup-modal");
+        const signupClose = document.querySelector(".signup-close");
+        const signupTrigger = document.querySelector(".open-signup");
+
+        if (loginTrigger && loginModal) {
+          loginTrigger.addEventListener("click", () =>
+            loginModal.classList.remove("hidden")
+          );
+        }
+        if (loginClose) {
+          loginClose.addEventListener("click", () =>
+            loginModal.classList.add("hidden")
+          );
+        }
+
+        if (signupTrigger && signupModal) {
+          signupTrigger.addEventListener("click", () => {
+            loginModal.classList.add("hidden");
+            signupModal.classList.remove("hidden");
+          });
+        }
+
+        if (signupClose) {
+          signupClose.addEventListener("click", () =>
+            signupModal.classList.add("hidden")
+          );
+        }
+      });
+    </script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

@@ -98,7 +98,7 @@ header {
   background: transparent;
   font-size: 14px;
   padding: 4px 6px;
-  width: 100px;
+  width: 120px;
   outline: none;
 }
 .search-inline input::placeholder {

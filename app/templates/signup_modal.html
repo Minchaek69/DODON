@@ -1,0 +1,21 @@
+<!-- Signup Modal -->
+<div id="signup-modal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-btn signup-close">&times;</span>
+    <h2>회원가입</h2>
+    <form method="POST" action="{{ url_for('auth_bp.signup') }}">
+      <input type="text" name="username" placeholder="사용자 이름" required />
+      <input type="email" name="email" placeholder="이메일 주소" required />
+      <input type="tel" name="phone" placeholder="휴대폰 번호 (선택)" />
+      <input type="password" name="password" placeholder="비밀번호" required />
+      <input
+        type="password"
+        name="confirm"
+        placeholder="비밀번호 확인"
+        required
+      />
+
+      <button type="submit">회원가입</button>
+    </form>
+  </div>
+</div>
