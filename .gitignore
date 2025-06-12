@@ -1,4 +1,7 @@
+# Python virtual environment
 __pycache__/
 *.__pycache__
 *.pyc
 *.pyo
+# macOS system file
+.DS_Store
