@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block title %}DODON | Home{% endblock %} {% block
-content %} {% if session.get('email') %}
-<h2>환영합니다, {{ session.get('email') }} 님!</h2>
+content %} {% if session.get('user_email') %}
+<h2>환영합니다, {{ session.get('user_email') }} 님!</h2>
 {% else %}
 <h2>DODON에 오신 것을 환영합니다.</h2>
 <p>로그인 또는 회원가입을 해주세요.</p>
@@ -8,7 +8,7 @@ content %} {% if session.get('email') %}
 
 <section class="hero">
   <h1>DODON</h1>
-  <a href="{{ url_for('products.index') }}" class="btn">상품 보러가기</a>
+  <a href="{{ url_for('products_bp.index') }}" class="btn">상품 보러가기</a>
 </section>
 
 <section class="featured">

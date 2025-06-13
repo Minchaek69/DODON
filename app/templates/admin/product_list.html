@@ -1,0 +1,54 @@
+{% extends 'base.html' %} {% block title %}Admin - Product List{% endblock %} {%
+block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">상품 목록 관리</h1>
+  <a
+    href="{{ url_for('admin_bp.new_product') }}"
+    class="inline-block bg-black text-white px-4 py-2 rounded hover:bg-gray-800 mb-6"
+  >
+    + 새 상품 업로드
+  </a>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for p in products %}
+    <div
+      class="border rounded shadow hover:shadow-md transition overflow-hidden bg-white"
+    >
+      {% if p.image_url %}
+      <img
+        src="{{ url_for('static', filename='uploads/' + p.image_url) }}"
+        alt="{{ p.name }}"
+        class="w-full h-100 object-cover"
+      />
+      {% else %}
+      <div
+        class="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-500"
+      >
+        No Image
+      </div>
+      {% endif %}
+      <div class="p-4">
+        <h2 class="text-lg font-semibold mb-2">{{ p.name }}</h2>
+        <p class="text-sm text-gray-600 mb-1">
+          ₩{{ '{:,.0f}'.format(p.price) }}
+        </p>
+        <p class="text-xs text-gray-500 mb-3">재고: {{ p.stock }}개</p>
+
+        <form
+          action="{{ url_for('admin_bp.delete_product', product_id=p.id) }}"
+          method="POST"
+          onsubmit="return confirm('정말 삭제하시겠습니까?');"
+        >
+          <button
+            type="submit"
+            class="text-sm text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
+          >
+            삭제
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

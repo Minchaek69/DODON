@@ -8,6 +8,6 @@ def index():
 
 @main_bp.route('/profile')
 def profile():
-    if not session.get('email'):
+    if not session.get('user_email'):
         return redirect(url_for('auth_bp.login')) 
-    return render_template('profile.html', user_email=session['email'])
+    return render_template('profile.html', user_email=session['user_email'])

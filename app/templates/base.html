@@ -47,6 +47,12 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+
     <style>
       .flash-messages {
         position: fixed;
@@ -113,12 +119,12 @@
         <!-- Center: Navigation Menu -->
         <nav class="header-center">
           <ul>
-            <li><a href="#">홈</a></li>
-            <li><a href="#">전체 상품</a></li>
+            <li><a href="{{ url_for('main.index') }}">홈</a></li>
+            <li><a href="{{ url_for('products_bp.index') }}">전체 상품</a></li>
             <li><a href="#">상의</a></li>
             <li><a href="#">하의</a></li>
             <li><a href="#">원피스</a></li>
-            <li><a href="#">문의하기</a></li>
+            <li><a href="#">도움</a></li>
             <li><a href="#">About us</a></li>
           </ul>
         </nav>
@@ -132,7 +138,15 @@
           <a href="/cart" title="장바구니"
             ><i class="fa-solid fa-bag-shopping"></i
           ></a>
-          {% if session.get('email') %}
+          {% if session.get('user_email') %} {% if session.get('is_admin') %}
+          <a
+            href="{{ url_for('admin_bp.admin_products') }}"
+            title="상품 업로드"
+          >
+            <i class="fa-solid fa-upload"></i>
+          </a>
+          {% endif %}
+
           <!-- 로그인 상태: 사용자 정보로 이동 -->
           <a href="{{ url_for('main.profile') }}" title="마이페이지">
             <i class="fa-solid fa-user"></i>
@@ -214,6 +228,19 @@
         {% endif %}
       });
     </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            const loginModal = document.getElementById("login-modal");
+            if (loginModal) loginModal.classList.remove("hidden");
+          {% endif %}
+        {% endfor %}
+        {% endwith %}
+      });
+    </script>
+
     {% block scripts %}{% endblock %}
   </body>
 </html>
