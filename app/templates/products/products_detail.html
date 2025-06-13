@@ -1,55 +1,259 @@
-{% extends 'base.html' %} {% block title %}{{ product.name }} - DODON{% endblock
-%} {% block content %}
-<div class="max-w-5xl mx-auto p-8 grid grid-cols-1 md:grid-cols-2 gap-10">
-  <div>
-    <img
-      src="{{ url_for('static', filename='uploads/' + product.image_url) }}"
-      alt="{{ product.name }}"
-      class="w-full rounded shadow"
-    />
+{% extends 'base.html' %} {% block title %}{{ product.name }}{% endblock %} {%
+block content %}
 
-    {% if product.detail_images %}
-    <div class="grid grid-cols-3 gap-2 mt-4">
-      {% for img in product.detail_images.split(',') %}
-      <img
-        src="{{ url_for('static', filename='uploads/' + img) }}"
-        class="w-full h-28 object-cover rounded border"
-      />
-      {% endfor %}
-    </div>
-    {% endif %}
-  </div>
-
-  <div>
-    <h1 class="text-2xl font-bold mb-2">{{ product.name }}</h1>
-    <p class="text-gray-700 mb-2">₩{{ '{:,.0f}'.format(product.price) }}</p>
-    <p class="text-sm text-gray-500 mb-2">{{ product.material }}</p>
-
-    {% if product.color_options %}
-    <div class="mb-2">
-      <label class="block font-semibold">색상</label>
-      <div class="flex gap-2">
-        {% for color in product.color_options.split(',') %}
-        <span class="px-2 py-1 text-sm border rounded">{{ color }}</span>
+<div class="container mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <div class="flex flex-col md:flex-row-reverse gap-4">
+      <div class="flex-grow flex justify-center items-start">
+        <img
+          id="main-image"
+          src="{{ url_for('static', filename='uploads/' ~ product.image_url) }}"
+          alt="{{ product.name }} Main Image"
+          class="w-full max-w-lg object-contain"
+        />
+      </div>
+      <div
+        class="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto pb-2 md:pb-0"
+      >
+        <img
+          src="{{ url_for('static', filename='uploads/' ~ product.image_url) }}"
+          alt="Thumbnail 1"
+          class="w-20 h-20 object-cover border border-gray-200 hover:border-black cursor-pointer p-1"
+          onclick="switchImage(this.src)"
+        />
+        {% for img in product.detail_images.split(',') %}
+        <img
+          src="{{ url_for('static', filename='uploads/' ~ img.strip()) }}"
+          alt="Thumbnail {{ loop.index + 1 }}"
+          class="w-20 h-20 object-cover border border-gray-200 hover:border-black cursor-pointer p-1"
+          onclick="switchImage(this.src)"
+        />
         {% endfor %}
       </div>
     </div>
-    {% endif %} {% if product.size_options %}
-    <div class="mb-2">
-      <label class="block font-semibold">사이즈</label>
-      <div class="flex gap-2">
-        {% for size in product.size_options.split(',') %}
-        <span class="px-2 py-1 text-sm border rounded">{{ size }}</span>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
 
-    <div class="mt-4">
-      <p class="text-sm text-gray-600 whitespace-pre-line">
-        {{ product.description }}
+    <div class="px-4">
+      <h1 class="text-3xl font-bold mb-2">{{ product.name }}</h1>
+      <p class="text-xl font-semibold mb-4">
+        ₩{{ '{:,.0f}'.format(product.price) }}
       </p>
+
+      {% if product.color_options %}
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >색상:</label
+        >
+        <div class="flex flex-wrap gap-2">
+          {% for color in product.color_options.split(',') %}
+          <button
+            class="w-8 h-8 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black relative"
+            style="background-color: {{ color.strip() | lower_color_name }}"
+            title="{{ color.strip() }}"
+            onclick="selectOption(this, 'color')"
+          >
+            <span
+              class="absolute inset-0 flex items-center justify-center text-white text-xs hidden"
+              data-selected-indicator
+              >✔</span
+            >
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %} {% if product.size_options %}
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >사이즈:</label
+        >
+        <div class="flex flex-wrap gap-2">
+          {% for size in product.size_options.split(',') %}
+          <button
+            class="px-4 py-2 border border-gray-300 rounded text-sm hover:border-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            onclick="selectOption(this, 'size')"
+          >
+            {{ size.strip() }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >수량:</label
+        >
+        <div class="flex items-center border border-gray-300 rounded w-24">
+          <button
+            class="px-3 py-1 text-lg font-semibold"
+            onclick="changeQuantity(-1)"
+          >
+            -
+          </button>
+          <input
+            type="text"
+            id="quantity-input"
+            value="1"
+            min="1"
+            max="{{ product.stock }}"
+            class="w-full text-center border-x border-gray-300 py-1 focus:outline-none"
+            onchange="validateQuantity()"
+          />
+          <button
+            class="px-3 py-1 text-lg font-semibold"
+            onclick="changeQuantity(1)"
+          >
+            +
+          </button>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">재고: {{ product.stock }}개</p>
+      </div>
+
+      <div class="flex flex-col gap-3 mt-6">
+        <button
+          class="bg-black text-white px-8 py-3 rounded-md hover:bg-neutral-800 text-lg font-medium"
+        >
+          🛒 장바구니에 담기
+        </button>
+        <button
+          class="border border-gray-300 text-gray-800 px-8 py-3 rounded-md hover:bg-gray-50 text-lg font-medium flex items-center justify-center gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          찜하기
+        </button>
+      </div>
+
+      <div class="mt-8 border-t border-gray-200 pt-6">
+        <h2 class="text-lg font-semibold mb-3">상품 정보</h2>
+        <p class="text-sm leading-relaxed whitespace-pre-line">
+          소재: {{ product.material }}<br />
+          {{ product.description }}
+        </p>
+        <div class="mt-4">
+          <details class="group">
+            <summary
+              class="flex justify-between items-center cursor-pointer py-2 border-b border-gray-200 text-gray-700 hover:text-black"
+            >
+              <span class="text-sm font-medium">배송 정보</span>
+              <span
+                class="ml-auto transform transition-transform duration-200 group-open:rotate-180"
+                >&#9660;</span
+              >
+            </summary>
+            <div class="pt-2 pb-4 text-sm text-gray-600">
+              <p>기본 배송비 3,000원</p>
+              <p>5만원 이상 구매 시 무료 배송</p>
+              <p>주문 후 2-5 영업일 이내 배송</p>
+            </div>
+          </details>
+          <details class="group">
+            <summary
+              class="flex justify-between items-center cursor-pointer py-2 border-b border-gray-200 text-gray-700 hover:text-black"
+            >
+              <span class="text-sm font-medium">교환/반품 정책</span>
+              <span
+                class="ml-auto transform transition-transform duration-200 group-open:rotate-180"
+                >&#9660;</span
+              >
+            </summary>
+            <div class="pt-2 pb-4 text-sm text-gray-600">
+              <p>상품 수령 후 7일 이내에 교환/반품 신청 가능</p>
+              <p>자세한 내용은 고객센터로 문의 바랍니다.</p>
+            </div>
+          </details>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  function switchImage(src) {
+    const mainImage = document.getElementById("main-image");
+    mainImage.src = src;
+  }
+
+  // Option selection (color/size)
+  let selectedOptions = {
+    color: null,
+    size: null,
+  };
+
+  function selectOption(button, type) {
+    // Remove selected style from previously selected button of the same type
+    const currentlySelected = document.querySelector(
+      `button[data-selected-${type}]`
+    );
+    if (currentlySelected) {
+      currentlySelected.removeAttribute(`data-selected-${type}`);
+      currentlySelected.classList.remove(
+        "border-black",
+        "ring-2",
+        "ring-offset-2",
+        "ring-black"
+      );
+      // Hide checkmark for color buttons
+      const indicator = currentlySelected.querySelector(
+        "[data-selected-indicator]"
+      );
+      if (indicator) {
+        indicator.classList.add("hidden");
+      }
+    }
+
+    // Add selected style to the clicked button
+    button.setAttribute(`data-selected-${type}`, "true");
+    button.classList.add(
+      "border-black",
+      "ring-2",
+      "ring-offset-2",
+      "ring-black"
+    );
+    // Show checkmark for color buttons
+    const indicator = button.querySelector("[data-selected-indicator]");
+    if (indicator) {
+      indicator.classList.remove("hidden");
+    }
+
+    selectedOptions[type] = button.textContent.trim() || button.title; // For color, use title or background-color directly if exact match is needed
+    console.log(`Selected ${type}: ${selectedOptions[type]}`);
+  }
+
+  // Quantity Selector
+  const quantityInput = document.getElementById("quantity-input");
+  const maxStock = parseInt(quantityInput.max);
+
+  function changeQuantity(delta) {
+    let currentQuantity = parseInt(quantityInput.value);
+    let newQuantity = currentQuantity + delta;
+
+    if (newQuantity < 1) {
+      newQuantity = 1;
+    }
+    if (newQuantity > maxStock) {
+      newQuantity = maxStock;
+    }
+    quantityInput.value = newQuantity;
+  }
+
+  function validateQuantity() {
+    let currentQuantity = parseInt(quantityInput.value);
+    if (isNaN(currentQuantity) || currentQuantity < 1) {
+      quantityInput.value = 1;
+    } else if (currentQuantity > maxStock) {
+      quantityInput.value = maxStock;
+    }
+  }
+</script>
+
 {% endblock %}

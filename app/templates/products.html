@@ -1,28 +1,30 @@
 {% extends 'base.html' %} {% block title %}전체 상품{% endblock %} {% block
 content %}
-<div class="max-w-6xl mx-auto px-4 py-10">
-  <h1 class="text-2xl font-bold mb-6">전체 상품</h1>
+<div class="max-w-screen-xl mx-auto px-6 py-10">
+  <h1 class="text-2xl font-semibold mb-8">전체 상품</h1>
 
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    {% for product in products %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-8 gap-y-16">
+    {% for p in products %}
     <a
-      href="{{ url_for('products_bp.product_detail', product_id=product.id) }}"
-      class="block border rounded overflow-hidden shadow hover:shadow-md transition"
+      href="{{ url_for('products_bp.product_detail', product_id=p.id) }}"
+      class="group block"
     >
-      <img
-        src="{{ url_for('static', filename='uploads/' + product.image_url) }}"
-        alt="{{ product.name }}"
-        class="w-full h-72 object-cover"
-      />
-      <div class="p-4">
-        <h2 class="text-sm font-semibold mb-1 line-clamp-2">
-          {{ product.name }}
-        </h2>
-        <p class="text-gray-700 text-sm">
-          가격: ₩{{ '{:,.0f}'.format(product.price) }}
+      <div class="overflow-hidden rounded">
+        <img
+          src="{{ url_for('static', filename='uploads/' + p.image_url) }}"
+          alt="{{ p.name }}"
+          class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      </div>
+      <div class="mt-4 text-sm leading-snug">
+        <p class="text-black font-medium line-clamp-2">{{ p.name }}</p>
+        <p class="text-neutral-700 mt-1 font-semibold">
+          ₩{{ '{:,.0f}'.format(p.price) }}
         </p>
-        <p class="text-gray-500 text-xs">색상: {{ product.color_options }}</p>
-        <p class="text-gray-500 text-xs">사이즈: {{ product.size_options }}</p>
+        <p class="text-neutral-400 text-xs mt-0.5">
+          색상: {{ p.color_options }}
+        </p>
+        <p class="text-neutral-400 text-xs">사이즈: {{ p.size_options }}</p>
       </div>
     </a>
     {% endfor %}
