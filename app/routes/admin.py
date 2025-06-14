@@ -36,64 +36,67 @@ def delete_product(product_id):
     db.session.commit()
     flash('Product deleted successfully!')
     return redirect(url_for('admin_bp.admin_products'))
-
-@admin_bp.route('/products/new', methods=['GET', 'POST'])
+@admin_bp.route('/products/new', methods=['GET','POST'])
 @admin_required
 def new_product():
     if request.method == 'POST':
-        name = request.form.get('name')
-        product_code = request.form.get('product_code')
-        price = request.form.get('price')
-        stock = request.form.get('stock')
-        material = request.form.get('material')
-        category = int(request.form.get('category'))
-        color_options = request.form.get('color_options')
-        size_options = request.form.get('size_options')
-        description = request.form.get('description')
-        is_visible = bool(request.form.get('is_visible', True))
- # 대표 이미지
-        main_image_file = request.files.get('main_image')
-        main_image_filename = None
-        if main_image_file and allowed_file(main_image_file.filename):
-            main_image_filename = secure_filename(main_image_file.filename)
-            main_image_path = os.path.join(UPLOAD_FOLDER, main_image_filename)
-            main_image_file.save(main_image_path)
+        # --- 1) 基本字段 ---
+        name         = request.form['name']
+        code         = request.form['product_code']
+        price        = request.form['price']
+        material     = request.form['material']
+        category     = int(request.form['category'])
+        description  = request.form.get('description','')
 
-        # 상세 이미지 (여러 장)
-        detail_files = request.files.getlist('detail_images')
-        detail_filenames = []
-        for file in detail_files:
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(UPLOAD_FOLDER, filename))
-                detail_filenames.append(filename)
+        # --- 2) 处理图片 ---
+        # （跟你之前一样，保存 main_image、detail_images、size_image 并获得各自的文件名）
+        main_img_file = request.files['main_image']
+        main_fname    = secure_filename(main_img_file.filename)
+        main_img_file.save(os.path.join(UPLOAD_FOLDER, main_fname))
 
-        # 사이즈 이미지
-        size_image_file = request.files.get('size_image')
-        size_image_filename = None
-        if size_image_file and allowed_file(size_image_file.filename):
-            size_image_filename = secure_filename(size_image_file.filename)
-            size_image_file.save(os.path.join(UPLOAD_FOLDER, size_image_filename))
+        detail_files  = request.files.getlist('detail_images')
+        detail_fnames = []
+        for f in detail_files:
+            fn = secure_filename(f.filename)
+            f.save(os.path.join(UPLOAD_FOLDER, fn))
+            detail_fnames.append(fn)
 
-        # DB 저장
+        size_img_file = request.files.get('size_image')
+        size_fname    = None
+        if size_img_file:
+            size_fname = secure_filename(size_img_file.filename)
+            size_img_file.save(os.path.join(UPLOAD_FOLDER, size_fname))
+
+        # --- 3) 写 Product （先不设 stock）---
         product = Product(
-            name=name,
-            product_code=product_code,
-            price=price,
-            stock=stock,
-            material=material,
-            category=category,
-            color_options=color_options,
-            size_options=size_options,
-            description=description,
-            image_url=main_image_filename,
-            detail_images=','.join(detail_filenames),
-            size_image=size_image_filename,
-            is_visible=is_visible,
-            created_at=datetime.datetime.utcnow()
+            name          = name,
+            product_code  = code,
+            price         = price,
+            material      = material,
+            category      = category,
+            description   = description,
+            image_url     = main_fname,
+            detail_images = ",".join(detail_fnames),
+            size_image    = size_fname,
+            is_visible    = True
         )
-
         db.session.add(product)
+        db.session.flush()  # 拿到 product.id
+
+        # --- 4) 写 Variants ---
+        colors = request.form.getlist('variant_color[]')
+        sizes  = request.form.getlist('variant_size[]')
+        stocks = request.form.getlist('variant_stock[]')
+
+        for c, s, st in zip(colors, sizes, stocks):
+            v = Variant(
+                product_id = product.id,
+                color      = c.strip(),
+                size       = s.strip(),
+                stock      = int(st)
+            )
+            db.session.add(v)
+
         db.session.commit()
         flash('상품이 성공적으로 업로드되었습니다.', 'success')
         return redirect(url_for('admin_bp.admin_products'))

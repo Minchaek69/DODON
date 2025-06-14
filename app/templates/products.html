@@ -13,18 +13,17 @@ content %}
         <img
           src="{{ url_for('static', filename='uploads/' + p.image_url) }}"
           alt="{{ p.name }}"
-          class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+          class="w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
       <div class="mt-4 text-sm leading-snug">
-        <p class="text-black font-medium line-clamp-2">{{ p.name }}</p>
-        <p class="text-neutral-700 mt-1 font-semibold">
-          ₩{{ '{:,.0f}'.format(p.price) }}
-        </p>
-        <p class="text-neutral-400 text-xs mt-0.5">
-          색상: {{ p.color_options }}
-        </p>
-        <p class="text-neutral-400 text-xs">사이즈: {{ p.size_options }}</p>
+        <p class="font-medium text-black line-clamp-2">{{ p.name }}</p>
+        <p class="mt-1 font-semibold">₩{{ '{:,.0f}'.format(p.price) }}</p>
+        <div class="text-neutral-400 text-xs mt-1">
+          {% for v in p.variants %} {{ v.color }} / {{ v.size }}: {{ v.stock
+          }}개<br />
+          {% else %} 색상/사이즈 정보 없음 {% endfor %}
+        </div>
       </div>
     </a>
     {% endfor %}

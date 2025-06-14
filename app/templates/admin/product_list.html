@@ -32,7 +32,17 @@ block content %}
         <p class="text-sm text-gray-600 mb-1">
           ₩{{ '{:,.0f}'.format(p.price) }}
         </p>
-        <p class="text-xs text-gray-500 mb-3">재고: {{ p.stock }}개</p>
+        {# Variant stock details #}
+        <div class="text-xs text-gray-500 mb-3 space-y-1">
+          {% for v in p.variants %}
+          <div class="flex justify-between">
+            <span>{{ v.color }} / {{ v.size }}</span>
+            <span>{{ v.stock }}개</span>
+          </div>
+          {% else %}
+          <div class="italic">재고 정보 없음</div>
+          {% endfor %}
+        </div>
 
         <form
           action="{{ url_for('admin_bp.delete_product', product_id=p.id) }}"
