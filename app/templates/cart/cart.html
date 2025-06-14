@@ -1,0 +1,284 @@
+{% extends 'base.html' %} {% block title %}Shopping Cart{% endblock %} {% block
+content %}
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">🛒 My Shopping Cart</h1>
+
+  {% if cart %}
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <div class="flow-root">
+      <ul role="list" class="-my-6 divide-y divide-gray-200">
+        {% for item_key, item in cart.items() %}
+        <li class="flex py-6">
+          <div
+            class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200"
+          >
+            <img
+              src="{{ url_for('static', filename='uploads/' ~ item.image_url) }}"
+              alt="{{ item.name }}"
+              class="h-full w-full object-cover object-center"
+            />
+          </div>
+
+          <div class="ml-4 flex flex-1 flex-col">
+            <div>
+              <div
+                class="flex justify-between text-base font-medium text-gray-900"
+              >
+                <h3>
+                  <a
+                    href="{{ url_for('products_bp.product_detail', product_id=item.product_id) }}"
+                    >{{ item.name }}</a
+                  >
+                </h3>
+                <p class="ml-4">₩{{ item.total_display }}</p>
+              </div>
+              <p class="mt-1 text-sm text-gray-500">
+                {% if item.color %}Color: {{ item.color }}{% endif %}{% if
+                item.size %}{% if item.color %}, {% endif %}Size: {{ item.size
+                }}{% endif %}
+              </p>
+            </div>
+            <div class="flex flex-1 items-end justify-between text-sm">
+              <div class="flex items-center">
+                <label for="quantity-{{ item_key }}" class="sr-only"
+                  >Quantity</label
+                >
+                <button
+                  onclick="updateCartItem('{{ item_key }}', 'decrement')"
+                  class="px-2 py-1 border rounded-l focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                >
+                  -
+                </button>
+                <input
+                  id="quantity-{{ item_key }}"
+                  type="number"
+                  value="{{ item.quantity }}"
+                  min="1"
+                  class="w-16 text-center border-y border-gray-300 py-1 focus:outline-none"
+                  onchange="updateCartItem('{{ item_key }}', 'manual')"
+                />
+                <button
+                  onclick="updateCartItem('{{ item_key }}', 'increment')"
+                  class="px-2 py-1 border rounded-r focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                >
+                  +
+                </button>
+              </div>
+
+              <div class="flex">
+                <button
+                  type="button"
+                  onclick="showRemoveModal('{{ item_key }}')"
+                  class="font-medium text-red-600 hover:text-red-500"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-gray-200 px-4 py-6 sm:px-6 mt-6">
+    <div class="flex justify-between text-base font-medium text-gray-900">
+      <p>Total Item Price:</p>
+      <p>₩{{ '{:,.0f}'.format(total_price) }}</p>
+    </div>
+    <p class="mt-0.5 text-sm text-gray-500">
+      Shipping and taxes calculated at checkout.
+    </p>
+    <div class="mt-6">
+      <a
+        href="#"
+        class="flex items-center justify-center rounded-md border border-transparent bg-black px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-neutral-800"
+        >Proceed to Checkout</a
+      >
+    </div>
+    <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
+      <p>
+        or
+        <a
+          href="{{ url_for('products_bp.product_detail', product_id=1) }}"
+          class="font-medium text-black hover:text-neutral-800"
+          >Continue Shopping<span aria-hidden="true"> &rarr;</span></a
+        >
+      </p>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-center text-gray-600 text-lg">Your cart is empty.</p>
+  <div class="mt-6 text-center">
+    <a
+      href="{{ url_for('main.index') }}"
+      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+      >Go to Shop</a
+    >
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  // Update cart item quantity
+  function updateCartItem(itemKey, action) {
+    const quantityInput = document.getElementById(`quantity-${itemKey}`);
+    let newQuantity = parseInt(quantityInput.value);
+    if (action === "increment") {
+      newQuantity++;
+    } else if (action === "decrement") {
+      newQuantity--;
+    } else if (action === "manual") {
+      if (isNaN(newQuantity) || newQuantity < 1) newQuantity = 1;
+    }
+    if (newQuantity <= 0) {
+      showRemoveModal(itemKey);
+      return;
+    }
+    fetch("/cart/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item_key: itemKey, quantity: newQuantity }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) window.location.reload();
+        else window.location.reload();
+      })
+      .catch((err) => console.error("Error:", err));
+  }
+
+  // Custom remove flow: show modal
+  let pendingItemKey = null;
+  function showRemoveModal(itemKey) {
+    pendingItemKey = itemKey;
+    document.getElementById("removeModal").classList.remove("hidden");
+  }
+  function hideRemoveModal() {
+    document.getElementById("removeModal").classList.add("hidden");
+    pendingItemKey = null;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document
+      .getElementById("cancelRemoveBtn")
+      .addEventListener("click", hideRemoveModal);
+    document
+      .getElementById("confirmRemoveBtn")
+      .addEventListener("click", () => {
+        if (!pendingItemKey) return;
+        fetch("/cart/remove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ item_key: pendingItemKey }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            hideRemoveModal();
+            if (data.success) window.location.reload();
+          })
+          .catch((err) => {
+            console.error(err);
+            hideRemoveModal();
+          });
+      });
+  });
+</script>
+
+<!-- Remove Confirmation Modal -->
+<!-- Remove Confirmation Modal -->
+<div
+  id="removeModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4 hidden"
+  onclick="hideRemoveModal()"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative transform transition-transform duration-200 scale-95"
+    onclick="event.stopPropagation()"
+  >
+    <!-- 右上角关闭 -->
+    <button
+      class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+      onclick="hideRemoveModal()"
+      aria-label="Close"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+
+    <h3 class="text-2xl font-semibold text-gray-900 mb-4">
+      정말 삭제하시겠습니까?
+    </h3>
+    <p class="text-gray-600 mb-6">선택하신 상품을 장바구니에서 제거합니다.</p>
+
+    <div class="flex justify-end space-x-3">
+      <!-- ★ 一定要加上这个 id -->
+      <button
+        id="cancelRemoveBtn"
+        onclick="hideRemoveModal()"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+      >
+        취소
+      </button>
+      <button
+        id="confirmRemoveBtn"
+        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+      >
+        삭제
+      </button>
+    </div>
+  </div>
+</div>
+
+{% block scripts %} {{ super() }}
+<script>
+  let pendingItemKey = null;
+  function showRemoveModal(key) {
+    pendingItemKey = key;
+    document.getElementById("removeModal").classList.remove("hidden");
+  }
+  function hideRemoveModal() {
+    document.getElementById("removeModal").classList.add("hidden");
+    pendingItemKey = null;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // 可选链防止 null 报错
+    document
+      .getElementById("cancelRemoveBtn")
+      ?.addEventListener("click", hideRemoveModal);
+    document
+      .getElementById("confirmRemoveBtn")
+      ?.addEventListener("click", () => {
+        if (!pendingItemKey) return;
+        fetch("/cart/remove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ item_key: pendingItemKey }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            hideRemoveModal();
+            if (data.success) window.location.reload();
+          })
+          .catch((err) => {
+            console.error(err);
+            hideRemoveModal();
+          });
+      });
+  });
+</script>
+{% endblock %} {% endblock %}

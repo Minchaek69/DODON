@@ -5,108 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}DODON | 행운을 가져다주는 옷{% endblock %}</title>
 
-    <!-- SEO -->
+    <!-- SEO Meta -->
     <meta
       name="description"
       content="DODON은 20~35세 여성을 위한 유니크한 감성의 브랜드입니다. 롱스커트, 미니원피스, 오버핏 상의 등, 나만의 행운을 이끄는 개성 있는 옷들을 만나보세요."
     />
     <meta
       name="keywords"
-      content="DODON, 도돈, 여성의류, 유니크 옷, 개성 있는 패션, 행운을 부르는 옷, 미니 원피스, 롱스커트, 오버핏 셔츠, 니트, 레싱스, Korean fashion, lucky clothes for women, 20s style, 30s fashion, minimalist clothing, casual wear, trendy outfits, knitwear"
+      content="DODON, 여성의류, 유니크, 패션, 미니원피스, 롱스커트, 니트"
     />
     <meta name="author" content="DODON" />
-    <link rel="canonical" href="https://www.dodon.kr/" />
 
     <!-- Favicon -->
     <link
-      rel="icon"
-      href="{{ url_for('static', filename='images/DODON logo.png') }}"
-      type="image/png"
-    />
-
-    <!-- CSS -->
-    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
     />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="DODON | 행운을 가져다주는 옷" />
-    <meta
-      property="og:description"
-      content="20~35세 여성을 위한 도돈만의 감성 의류. 행운을 끌어당기는 유니크한 스타일을 지금 만나보세요."
-    />
-    <meta
-      property="og:image"
-      content="{{ url_for('static', filename='images/og-image.jpg') }}"
-    />
-    <meta property="og:url" content="https://www.dodon.kr/" />
-
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
 
     <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
     />
-
-    <style>
-      .flash-messages {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 9999;
-        width: auto;
-        max-width: 90%;
-      }
-
-      .alert {
-        padding: 12px 24px;
-        border-radius: 6px;
-        font-weight: bold;
-        color: white;
-        margin-bottom: 10px;
-        text-align: center;
-        animation: fadeOut 5s forwards;
-      }
-
-      .alert-success {
-        background-color: #28a745;
-      }
-
-      .alert-error {
-        background-color: #dc3545;
-      }
-
-      .alert-info {
-        background-color: #17a2b8;
-      }
-
-      @keyframes fadeOut {
-        0% {
-          opacity: 1;
-        }
-        90% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-          display: none;
-        }
-      }
-    </style>
   </head>
 
   <body>
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %} {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %} {% endif %} {% endwith %}
-
     <header class="header-bar">
       <div class="header-container">
         <!-- Left: Logo -->
@@ -135,9 +61,21 @@
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" name="q" placeholder="검색" class="search-box" />
           </form>
-          <a href="/cart" title="장바구니"
-            ><i class="fa-solid fa-bag-shopping"></i
-          ></a>
+          <a
+            href="{{ url_for('cart.view_cart') }}"
+            title="장바구니"
+            class="relative"
+          >
+            <i class="fa-solid fa-bag-shopping"></i>
+            {% if cart_count > 0 %}
+            <span
+              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-3.5 h-3.5 flex items-center justify-center"
+            >
+              {{ cart_count }}
+            </span>
+            {% endif %}
+          </a>
+
           {% if session.get('user_email') %} {% if session.get('is_admin') %}
           <a
             href="{{ url_for('admin_bp.admin_products') }}"
@@ -163,84 +101,62 @@
         </div>
       </div>
     </header>
+
     <!-- Main Page Content -->
     <main>{% block content %} {% endblock %}</main>
 
-    <!-- Footer -->
-    <footer>
-      <div class="footer-links">
-        <a href="#">Contact</a>
-        <a href="#">Instagram</a>
-        <a href="#">Pinterest</a>
-        <a href="#">Terms</a>
+    <!-- Flash 信息栏 -->
+    <div
+      id="flash-container"
+      class="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-xl px-4 pointer-events-none"
+    >
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, msg in messages %}
+      <div
+        class="pointer-events-auto mb-2 px-6 py-3 rounded-lg shadow-lg {% if category=='success' %}bg-green-100 text-green-800 {% elif category=='error' %}bg-red-100 text-red-800 {% else %}bg-gray-100 text-gray-800 {% endif %}"
+      >
+        {{ msg }}
       </div>
-      <p>&copy; {{ current_year }} DODON. All rights reserved.</p>
+      {% endfor %} {% endif %} {% endwith %}
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t py-6">
+      <div class="container mx-auto text-center text-sm text-gray-600">
+        <div class="space-x-4 mb-2">
+          <a href="#" class="hover:text-black">Contact</a>
+          <a href="#" class="hover:text-black">Instagram</a>
+          <a href="#" class="hover:text-black">Pinterest</a>
+          <a href="#" class="hover:text-black">Terms</a>
+        </div>
+        <p>&copy; {{ current_year }} DODON. All rights reserved.</p>
+      </div>
     </footer>
 
+    <!-- LOGIN & SIGNUP MODALS -->
     {% include 'login_modal.html' %} {% include 'signup_modal.html' %}
-    <!-- JS -->
+
+    <!-- COMMON SCRIPTS -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/login_modal.js') }}"></script>
     <script src="{{ url_for('static', filename='js/signup_modal.js') }}"></script>
+
+    <!-- Flash auto-hide logic -->
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const loginModal = document.getElementById("login-modal");
-        const loginTrigger = document.getElementById("login-trigger");
-        const loginClose = document.querySelector(".login-close");
-
-        const signupModal = document.getElementById("signup-modal");
-        const signupClose = document.querySelector(".signup-close");
-        const signupTrigger = document.querySelector(".open-signup");
-
-        if (loginTrigger && loginModal) {
-          loginTrigger.addEventListener("click", () =>
-            loginModal.classList.remove("hidden")
-          );
-        }
-        if (loginClose) {
-          loginClose.addEventListener("click", () =>
-            loginModal.classList.add("hidden")
-          );
-        }
-
-        if (signupTrigger && signupModal) {
-          signupTrigger.addEventListener("click", () => {
-            loginModal.classList.add("hidden");
-            signupModal.classList.remove("hidden");
-          });
-        }
-
-        if (signupClose) {
-          signupClose.addEventListener("click", () =>
-            signupModal.classList.add("hidden")
-          );
-        }
-      });
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        {% if session.get('email') %}
-          // 로그인 후 모달 닫기
-          const loginModal = document.getElementById("login-modal");
-          const signupModal = document.getElementById("signup-modal");
-          if (loginModal) loginModal.classList.add("hidden");
-          if (signupModal) signupModal.classList.add("hidden");
-        {% endif %}
-      });
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-          {% if category == 'error' %}
-            const loginModal = document.getElementById("login-modal");
-            if (loginModal) loginModal.classList.remove("hidden");
-          {% endif %}
-        {% endfor %}
-        {% endwith %}
+      document.addEventListener("DOMContentLoaded", () => {
+        const flashes = document.querySelectorAll(".flash-item");
+        flashes.forEach((el) => {
+          // wait 4s then fade out
+          setTimeout(() => {
+            el.style.transition = "opacity 0.5s";
+            el.style.opacity = 0;
+            el.addEventListener("transitionend", () => el.remove());
+          }, 4000);
+        });
       });
     </script>
 
+    <!-- PAGE-SPECIFIC SCRIPTS -->
     {% block scripts %}{% endblock %}
   </body>
 </html>

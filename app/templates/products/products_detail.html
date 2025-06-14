@@ -107,9 +107,15 @@ block content %}
         </div>
         <p class="text-xs text-gray-500 mt-1">재고: {{ product.stock }}개</p>
       </div>
-
+      <input
+        type="hidden"
+        name="product_id"
+        id="product_id"
+        value="{{ product.id }}"
+      />
       <div class="flex flex-col gap-3 mt-6">
         <button
+          id="add-to-cart-button"
           class="bg-black text-white px-8 py-3 rounded-md hover:bg-neutral-800 text-lg font-medium"
         >
           🛒 장바구니에 담기
@@ -254,6 +260,47 @@ block content %}
       quantityInput.value = maxStock;
     }
   }
+</script>
+{% endblock %} {% block scripts %}
+<script>
+  document
+    .getElementById("add-to-cart-button")
+    .addEventListener("click", function (e) {
+      e.preventDefault();
+
+      const productId = document.getElementById("product_id").value;
+      const quantity = parseInt(
+        document.getElementById("quantity-input").value,
+        10
+      );
+      const color = selectedOptions.color || "default";
+      const size = selectedOptions.size || "FREE";
+
+      fetch("/cart/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: productId,
+          quantity: quantity,
+          color: color,
+          size: size,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            // 1) 刷新页面以更新右上角小红点 & 触发 flash 显示
+            window.location.reload();
+          } else {
+            // 虽然失败也刷新，让 flash("실패: ...","error") 显示出来
+            window.location.reload();
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          window.location.reload();
+        });
+    });
 </script>
 
 {% endblock %}
